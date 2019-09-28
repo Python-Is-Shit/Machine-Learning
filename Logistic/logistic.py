@@ -18,6 +18,9 @@ def change(l):
             l[i] = float(l[i])
     return l
 
+def find_Max(x):
+    return np.max(x, axis=1)
+
 def getTrain():
     path = './train.txt'
     with open(path, 'r') as fr:
@@ -29,11 +32,13 @@ def getTrain():
         l = change(l)
         x[i, :] = l[0:7]
         labels[i, :] = l[-1]
-    return x.transpose(), labels.transpose()
+    Max = np.max(x, axis=0)
+    x /= Max
+    return x.transpose(), labels.transpose(), Max
 
 def getWeigths(num, alpha = 0.001):
     path = './weigths'
-    x, labels = getTrain()
+    x, labels, Max = getTrain()
     weigths = np.ones(shape=(1, 7), dtype=np.float32)
     if os.path.exists(path):
         weigths = np.loadtxt(path)
@@ -42,9 +47,9 @@ def getWeigths(num, alpha = 0.001):
         g = Grad(x, labels, h)
         weigths = weigths + alpha * g
     np.savetxt(fname=path, X=weigths)
-    return weigths
+    return weigths, Max
 
-def getTest():
+def getTest(Max):
     path = './test.txt'
     with open(path, 'r') as fr:
         s = fr.readlines()
@@ -55,18 +60,19 @@ def getTest():
         l = change(l)
         id[i] = l[0]
         x[i, :] = l[1:]
+    x /= Max
     return x.transpose(), id
 
-def run_forward(weigths):
-    x, id = getTest()
+def run_forward(weigths, Max):
+    x, id = getTest(Max)
     h = sigmoid(np.dot(weigths, x))
     h = np.array(h[0, :] + 0.5, dtype=np.int)
     return h, id
 
 
 if __name__ == '__main__':
-    weigths = getWeigths(100)
-    h, id = run_forward(weigths)
+    weigths, Max = getWeigths(100)
+    h, id = run_forward(weigths, Max)
     path = './out.csv'
     with open(path, 'w') as f:
         fw = csv.writer(f)
