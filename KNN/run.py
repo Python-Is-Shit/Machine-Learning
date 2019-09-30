@@ -112,4 +112,4 @@ def KNN(K):
 
 
 if __name__ == '__main__':
-    KNN(15)
+    KNN(25)
