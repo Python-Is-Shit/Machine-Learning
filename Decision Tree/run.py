@@ -28,6 +28,8 @@ class DT(object):
             head.flag = 1
         else:
             head.flag = 0
+        if c == 0 or c == len(x):
+            return
         l = len(x[0])-1
         Max = -1
         index = -1
@@ -38,10 +40,10 @@ class DT(object):
             xx, _ = self.split(x, i)
             for item in xx:
                 sum += self.calc(item)
-            if sum > Max:
+            if Max == -1 or sum < Max:
                 Max = sum
                 index = i
-        if Max != 0 and Max != -1:
+        if Max != -1:
             Set.add(index)
             head.index = index
             xx, labels = self.split(x, index)
